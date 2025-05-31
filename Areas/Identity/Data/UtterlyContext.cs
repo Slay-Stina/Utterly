@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Utterly.Areas.Identity.Data;
 
-namespace Utterly.Data;
+namespace Utterly.Areas.Identity.Data;
 
 public class UtterlyContext : IdentityDbContext<UtterlyUser>
 {
