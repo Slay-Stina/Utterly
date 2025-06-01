@@ -1,10 +1,46 @@
 ﻿@page
-@model IndexModel
+@using Microsoft.AspNetCore.Identity
+@using Utterly.Areas.Identity.Data
+
+@inject UserManager<UtterlyUser> UserManager
+@model Utterly.Pages.IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (User != null)
+{
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="Post.Title" class="form-label"></label>
+            <input asp-for="Post.Title" class="form-control" />
+            <span asp-validation-for="Post.Title" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Post.Content" class="form-label"></label>
+            <textarea asp-for="Post.Content" class="form-control"></textarea>
+            <span asp-validation-for="Post.Content" class="text-danger"></span>
+        </div>
+        <input type="hidden" asp-for="Post.UserId" value="@UserManager.GetUserId(User)" />
+        <button type="submit" class="btn btn-primary">Post</button>
+    </form>
+}
+
+<hr />
+
+@foreach (var post in Model.UtterlyPosts)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">@post.Title</h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+                by @post.User?.UserName on @post.CreatedAt.ToString("g")
+            </h6>
+            <p class="card-text">@post.Content</p>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

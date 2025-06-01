@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Utterly.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using Utterly.Areas.Identity.Data;
 namespace Utterly.Migrations
 {
     [DbContext(typeof(UtterlyContext))]
-    partial class UtterlyContextModelSnapshot : ModelSnapshot
+    [Migration("20250601125851_PostInfo2")]
+    partial class PostInfo2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,13 +183,13 @@ namespace Utterly.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserName");
 
                     b.ToTable("UtterlyPosts");
                 });
@@ -314,7 +317,7 @@ namespace Utterly.Migrations
                 {
                     b.HasOne("Utterly.Areas.Identity.Data.UtterlyUser", "User")
                         .WithMany("Posts")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

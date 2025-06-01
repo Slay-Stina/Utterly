@@ -69,9 +69,10 @@ public class RegisterModel : PageModel
         public DateTime AgeLimit { get; } = DateTime.Now.AddYears(-18);
 
         [Required]
-        [DisplayName("Namn")]
+        [DisplayName("Användarnamn")]
         [DataType(DataType.Text)]
-        public string[] Name { get; set; } = new string[2];
+        [StringLength(30, ErrorMessage = "Användarnamnet måste vara minst {2} och högst {1} tecken långt.", MinimumLength = 3)]
+        public string UserName { get; set; }
 
 
         [Required]
@@ -79,6 +80,7 @@ public class RegisterModel : PageModel
         [DataType(DataType.Date)]
         [MinAge(18)]
         public DateTime BirthDate { get; set; }
+
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -123,7 +125,9 @@ public class RegisterModel : PageModel
         {
             var user = CreateUser();
 
-            await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+            user.BirthDate = Input.BirthDate;
+
+            await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
             await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
             var result = await _userManager.CreateAsync(user, Input.Password);
 

@@ -9,7 +9,8 @@ public class UtterlyUser : IdentityUser
     [PersonalData]
     [DataType(DataType.Date)]
     public DateTime BirthDate { get; set; }
-    [PersonalData]
-    public string[] Name { get; set; } = new string[2];
+
+    // Navigation property for posts
+    public ICollection<UtterlyPost> Posts { get; set; }
 }
 

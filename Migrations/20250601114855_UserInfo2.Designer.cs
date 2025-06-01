@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Utterly.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using Utterly.Areas.Identity.Data;
 namespace Utterly.Migrations
 {
     [DbContext(typeof(UtterlyContext))]
-    partial class UtterlyContextModelSnapshot : ModelSnapshot
+    [Migration("20250601114855_UserInfo2")]
+    partial class UserInfo2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,9 +175,6 @@ namespace Utterly.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -313,17 +313,12 @@ namespace Utterly.Migrations
             modelBuilder.Entity("Utterly.Areas.Identity.Data.UtterlyPost", b =>
                 {
                     b.HasOne("Utterly.Areas.Identity.Data.UtterlyUser", "User")
-                        .WithMany("Posts")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Utterly.Areas.Identity.Data.UtterlyUser", b =>
-                {
-                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

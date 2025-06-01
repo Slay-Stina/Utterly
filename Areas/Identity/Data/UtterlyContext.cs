@@ -18,7 +18,7 @@ public class UtterlyContext : IdentityDbContext<UtterlyUser>
 
         builder.Entity<UtterlyPost>()
             .HasOne(p => p.User)
-            .WithMany()
+            .WithMany(u => u.Posts)
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
