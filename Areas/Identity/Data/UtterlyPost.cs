@@ -13,14 +13,10 @@ public class UtterlyPost
     public DateTime CreatedAt { get; set; }
 
     [Required]
-    [DisplayName("Titel")]
-    [StringLength(50, ErrorMessage = "Max 50 tecken", MinimumLength = 1)]
-    public string Title { get; set; }
-
-    [Required]
     [DisplayName("Innehåll")]
     [StringLength(500, ErrorMessage = "Max 500 tecken", MinimumLength = 1)]
     public string Content { get; set; }
+    public int? ParentPostId { get; set; }
 
     // Foreign key to UtterlyUser
     [Required]

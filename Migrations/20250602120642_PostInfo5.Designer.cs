@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Utterly.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using Utterly.Areas.Identity.Data;
 namespace Utterly.Migrations
 {
     [DbContext(typeof(UtterlyContext))]
-    partial class UtterlyContextModelSnapshot : ModelSnapshot
+    [Migration("20250602120642_PostInfo5")]
+    partial class PostInfo5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,6 +180,11 @@ namespace Utterly.Migrations
 
                     b.Property<int?>("ParentPostId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
