@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Utterly.Attributes;

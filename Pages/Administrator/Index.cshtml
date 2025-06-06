@@ -1,0 +1,124 @@
+﻿@page
+@using Microsoft.AspNetCore.Identity
+@using Utterly.Areas.Identity.Data
+
+@model Utterly.Pages.Administrator.IndexModel
+@{
+}
+@{
+    ViewData["Title"] = "Adminsida";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div class="container">
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Användare</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Användar-ID</th>
+                        <th>Användarnamn</th>
+                        <th>E-post</th>
+                        <th>Roll</th>
+                        <th>Antal inlägg</th>
+                        <th>Åtgärder</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td><a asp-area="User/" asp-route-id="@user.Id">@user.UserName</a></td>
+                            <td>@user.Email</td>
+                            <td>@Model.Roles.Select(r => Model._userManager.IsInRoleAsync(user, r.Name).Result ? r.Name : "Ingen roll").FirstOrDefault()</td>
+                            <td>@Model.UtterlyPosts.Count(p => p.UserId == user.Id)</td>
+                            <td>
+                                <form method="post" asp-page-handler="EditUser" asp-route-id="@user.Id">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Redigera</button>
+                                </form>
+                                <form method="post" asp-page-handler="DeleteUser" asp-route-id="@user.Id">
+                                    <button type="submit" class="btn btn-danger btn-sm">Ta bort</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Roller</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Rollnamn</th>
+                        <th>Åtgärder</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var role in Model.Roles)
+                    {
+                        <tr>
+                            <td>@role.Name</td>
+                            <td>
+                                <form method="post" asp-page-handler="DeleteRole" asp-route-roleName="@role.Name">
+                                    <button type="submit" class="btn btn-danger btn-sm">Ta bort roll</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-header">
+            <h3>Lägg till roll</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <input asp-for="RoleName" class="form-control mb-1" />
+                <button type="submit" class="btn btn-primary">Skapa roll</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Inlägg</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Inläggs-ID</th>
+                        <th>Innehåll</th>
+                        <th>Användare</th>
+                        <th>Åtgärder</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var post in Model.UtterlyPosts)
+                    {
+                        <tr>
+                            <td>@post.Id</td>
+                            <td>@post.Content</td>
+                            <td>@Model.Users.SingleOrDefault(user => user.Id == post.UserId).UserName</td>
+                            <td>
+                                <form method="post" asp-page-handler="DeletePost" asp-route-id="@post.Id">
+                                    <button type="submit" class="btn btn-danger btn-sm">Ta bort inlägg</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

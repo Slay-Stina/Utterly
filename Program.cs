@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 using Utterly.Areas.Identity.Data;
+using Utterly.DAL;
 namespace Utterly;
 
 public class Program
@@ -17,6 +17,9 @@ public class Program
         builder.Services.AddDefaultIdentity<UtterlyUser>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<UtterlyContext>();
+
+        builder.Services.AddHttpClient();
+        builder.Services.AddTransient<APIManager>();
 
         // Add services to the container.
         builder.Services.AddRazorPages();
