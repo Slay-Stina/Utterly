@@ -6,16 +6,34 @@ namespace Utterly.DAL;
 public class APIManager
 {
     private readonly HttpClient _httpClient;
-    public APIManager(HttpClient httpClient)
+    private readonly UtterlyContext _utterlyContext;
+    public APIManager(HttpClient httpClient, UtterlyContext utterlyContext)
     {
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri("https://utterlyapi.azurewebsites.net/");
+        _utterlyContext = utterlyContext;
     }
     public async Task<List<UtterlyPost>> GetUtterlyPostsAsync()
     {
+        List<UtterlyPost> utterlyPosts = new List<UtterlyPost>();
         var response = await _httpClient.GetAsync("Post");
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
+        utterlyPosts = await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
+
+        // Hämta User-objektet för varje post
+        var userIds = utterlyPosts.Select(p => p.UserId).Distinct().ToList();
+        var users = _utterlyContext.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToDictionary(u => u.Id);
+
+        foreach (var post in utterlyPosts)
+        {
+            if (users.TryGetValue(post.UserId, out var user))
+            {
+                post.User = user;
+            }
+        }
+        return utterlyPosts;
     }
 
     public async Task<bool> CreateUtterlyPostAsync(UtterlyPost post)

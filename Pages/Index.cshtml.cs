@@ -29,6 +29,7 @@ public class IndexModel : PageModel
     public async Task OnGetAsync(int replyId)
     {
         UtterlyPosts = await _utterlyPostAPIManager.GetUtterlyPostsAsync();
+
         if (replyId != 0)
         {
             UPost = new();

@@ -54,7 +54,7 @@ else
             @foreach (var post in Model.UserPosts)
             {
                 <li class="list-group-item">
-                        <h5>@post.CreatedAt</h5>
+                        <h5>@post.CreatedAt.ToString("U")</h5>
                         <p>@post.Content</p>
                 </li>
             }
