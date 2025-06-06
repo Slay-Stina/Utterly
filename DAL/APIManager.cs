@@ -23,4 +23,14 @@ public class APIManager
         var response = await _httpClient.PostAsync("Post", post.ToContent());
         return response.IsSuccessStatusCode;
     }
+
+    internal async Task<List<UtterlyPost>> GetUtterlyPostsByUserIdAsync(string id)
+    {
+        var response = await _httpClient.GetAsync($"Post/User/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            return new List<UtterlyPost>();
+        }
+        return await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
+    }
 }

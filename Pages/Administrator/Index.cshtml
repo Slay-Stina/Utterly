@@ -11,7 +11,6 @@
 <h1>@ViewData["Title"]</h1>
 
 <div class="container">
-
     <div class="card mb-4">
         <div class="card-header">
             <h3>Användare</h3>
@@ -20,7 +19,6 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Användar-ID</th>
                         <th>Användarnamn</th>
                         <th>E-post</th>
                         <th>Roll</th>
@@ -32,14 +30,12 @@
                     @foreach (var user in Model.Users)
                     {
                         <tr>
-                            <td><a asp-area="User/" asp-route-id="@user.Id">@user.UserName</a></td>
+                            <td>@user.UserName</td>
                             <td>@user.Email</td>
                             <td>@Model.Roles.Select(r => Model._userManager.IsInRoleAsync(user, r.Name).Result ? r.Name : "Ingen roll").FirstOrDefault()</td>
                             <td>@Model.UtterlyPosts.Count(p => p.UserId == user.Id)</td>
                             <td>
-                                <form method="post" asp-page-handler="EditUser" asp-route-id="@user.Id">
-                                    <button type="submit" class="btn btn-secondary btn-sm">Redigera</button>
-                                </form>
+                                <a class="btn btn-secondary btn-sm" asp-page="EditUser" asp-route-id="@user.Id">Redigera</a>
                                 <form method="post" asp-page-handler="DeleteUser" asp-route-id="@user.Id">
                                     <button type="submit" class="btn btn-danger btn-sm">Ta bort</button>
                                 </form>

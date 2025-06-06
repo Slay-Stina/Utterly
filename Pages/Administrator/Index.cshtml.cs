@@ -31,29 +31,11 @@ public class IndexModel : PageModel
     [DisplayName("Rollnamn")]
     [BindProperty(SupportsGet = true)]
     public string RoleName { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public string AddUserId { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public string RemoveUserID { get; set; }
-
     public async Task OnGetAsync()
     {
         UtterlyPosts = await _utterlyPostAPIManager.GetUtterlyPostsAsync();
         Roles = await _roleManager.Roles.ToListAsync();
         Users = await _userManager.Users.ToListAsync();
-
-        if (AddUserId != null)
-        {
-            var user = await _userManager.FindByIdAsync(AddUserId);
-            await _userManager.AddToRoleAsync(user, RoleName);
-        }
-        if (RemoveUserID != null)
-        {
-            var user = await _userManager.FindByIdAsync(RemoveUserID);
-            await _userManager.RemoveFromRoleAsync(user, RoleName);
-        }
     }
 
     public async Task<IActionResult> OnPostAsync()
