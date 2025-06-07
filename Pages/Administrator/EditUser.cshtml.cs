@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using Utterly.Areas.Identity.Data;
 using Utterly.DAL;
@@ -11,20 +13,26 @@ public class EditUserModel : PageModel
 {
     private readonly UserManager<UtterlyUser> _userManager;
     private readonly APIManager _apiManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
+    public SelectList Roles { get; }
 
-    public EditUserModel(UserManager<UtterlyUser> userManager, APIManager apiManager)
+    public EditUserModel(
+        UserManager<UtterlyUser> userManager,
+        APIManager apiManager,
+        RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
         _apiManager = apiManager;
+        _roleManager = roleManager;
+        Roles = new SelectList(_roleManager.Roles.ToList(), "Name", "Name");
     }
 
     [BindProperty]
     public EditUserInputModel Input { get; set; }
-
     public UtterlyUser User { get; set; }
     public List<UtterlyPost> UserPosts { get; set; } = new();
     public bool IsEditMode { get; set; }
-
+    public string Role { get; set; }
     public class EditUserInputModel
     {
         public string Id { get; set; }
@@ -40,6 +48,9 @@ public class EditUserModel : PageModel
         [Display(Name = "Födelsedatum")]
         [DataType(DataType.Date)]
         public DateTime BirthDate { get; set; }
+
+        [Display(Name = "Roll")]
+        public string Role { get; set; }
     }
 
     public async Task<IActionResult> OnGetAsync(string id, bool edit = false)
@@ -50,6 +61,14 @@ public class EditUserModel : PageModel
         if (user == null) return NotFound();
 
         User = user;
+        foreach (var role in Roles)
+        {
+            if (await _userManager.IsInRoleAsync(User, role.Value))
+            {
+                Role = role.Value;
+                break;
+            }
+        }
         IsEditMode = edit;
 
         if (edit)
@@ -61,6 +80,15 @@ public class EditUserModel : PageModel
                 Email = user.Email,
                 BirthDate = user.BirthDate
             };
+
+            foreach (var role in Roles)
+            {
+                if (await _userManager.IsInRoleAsync(user, role.Value))
+                {
+                    Input.Role = role.Value;
+                    break;
+                }
+            }
         }
 
         UserPosts = await _apiManager.GetUtterlyPostsByUserIdAsync(user.Id);
@@ -80,6 +108,7 @@ public class EditUserModel : PageModel
         user.UserName = Input.UserName;
         user.Email = Input.Email;
         user.BirthDate = Input.BirthDate;
+        await _userManager.AddToRoleAsync(user, Input.Role);
 
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)

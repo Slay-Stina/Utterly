@@ -87,7 +87,7 @@
 
     <div class="card mb-4">
         <div class="card-header">
-            <h3>Inlägg</h3>
+            <h3>Senaste 20 inläggen</h3>
         </div>
         <div class="card-body">
             <table class="table table-striped">
@@ -100,7 +100,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var post in Model.UtterlyPosts)
+                    @foreach (var post in Model.UtterlyPosts.Take(20))
                     {
                         <tr>
                             <td>@post.Id</td>
