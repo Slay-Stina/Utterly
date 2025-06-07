@@ -1,0 +1,26 @@
+@page
+@model Utterly.Pages.Administrator.CategoriesModel
+@{
+    ViewData["Title"] = "Hantera kategorier";
+}
+
+<h2>Hantera kategorier</h2>
+
+<form method="post">
+    <div class="form-group mb-3">
+        <label asp-for="NewCategory.Name"></label>
+        <input asp-for="NewCategory.Name" class="form-control" />
+        <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Lägg till kategori</button>
+</form>
+
+<hr />
+
+<h3>Befintliga kategorier</h3>
+<ul>
+@foreach (var category in Model.Categories)
+{
+    <li>@category.Name</li>
+}
+</ul>

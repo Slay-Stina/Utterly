@@ -1,0 +1,32 @@
+@page
+@model Utterly.Pages.Administrator.RolesModel
+@{
+    ViewData["Title"] = "Hantera roller";
+}
+<h2>@ViewData["Title"]</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rollnamn</th>
+            <th>Åtgärder</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var role in Model.Roles)
+    {
+        <tr>
+            <td>@role.Name</td>
+            <td>
+                <form method="post" asp-page-handler="DeleteRole" asp-route-roleName="@role.Name" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Ta bort roll</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<h3>Lägg till roll</h3>
+<form method="post">
+    <input asp-for="RoleName" class="form-control mb-1" />
+    <button type="submit" class="btn btn-primary">Skapa roll</button>
+</form>

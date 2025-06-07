@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using Utterly.Areas.Identity.Data;
 using Utterly.DAL;

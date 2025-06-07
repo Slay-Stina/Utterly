@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Utterly.Areas.Identity.Data
+@inject Utterly.Areas.Identity.Data.UtterlyContext db
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -26,6 +29,19 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Kategorier
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                                @foreach (var category in db.Categories.ToList())
+                                {
+                                    <li>
+                                        <a class="dropdown-item" asp-page="/Threads/Index" asp-route-categoryId="@category.Id">@category.Name</a>
+                                    </li>
+                                }
+                            </ul>
                         </li>
                         @if (User.Identity.IsAuthenticated)
                         {

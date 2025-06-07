@@ -24,4 +24,8 @@ public class UtterlyPost
 
     // Navigation property
     public UtterlyUser? User { get; set; }
+
+    // Foreign key till Thread
+    public int ThreadId { get; set; }
+    public UtterlyThread Thread { get; set; }
 }

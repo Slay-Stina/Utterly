@@ -1,0 +1,31 @@
+@page
+@model Utterly.Pages.Administrator.PostsModel
+@{
+    ViewData["Title"] = "Hantera inlägg";
+}
+<h2>@ViewData["Title"]</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Inläggs-ID</th>
+            <th>Innehåll</th>
+            <th>Användare</th>
+            <th>Åtgärder</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var post in Model.UtterlyPosts)
+    {
+        <tr>
+            <td>@post.Id</td>
+            <td>@post.Content</td>
+            <td>@post.User?.UserName</td>
+            <td>
+                <form method="post" asp-page-handler="DeletePost" asp-route-id="@post.Id" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Ta bort</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

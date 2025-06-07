@@ -51,4 +51,16 @@ public class APIManager
         }
         return await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
     }
+
+    internal async Task<List<UtterlyPost>> GetPostsByThreadIdAsync(int threadId)
+    {
+        var response = await _httpClient.GetAsync($"Post/Thread/{threadId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Failed to fetch posts for the specified thread.");
+        }
+        var posts = await response.Content.ReadFromJsonAsync<List<UtterlyPost>>();
+
+        return posts;
+    }
 }
