@@ -11,5 +11,9 @@ public class UtterlyUser : IdentityUser
 
     // Navigation property for posts
     public ICollection<UtterlyPost> Posts { get; set; }
+
+    // Profile picture as byte array
+    [PersonalData]
+    public byte[]? ProfilePicture { get; set; }
 }
 

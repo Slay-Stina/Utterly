@@ -1,4 +1,5 @@
-﻿using Utterly.Areas.Identity.Data;
+﻿using Microsoft.AspNetCore.Identity;
+using Utterly.Areas.Identity.Data;
 using Utterly.Tools;
 
 namespace Utterly.DAL;
@@ -7,7 +8,9 @@ public class APIManager
 {
     private readonly HttpClient _httpClient;
     private readonly UtterlyContext _utterlyContext;
-    public APIManager(HttpClient httpClient, UtterlyContext utterlyContext)
+    public APIManager(
+        HttpClient httpClient, 
+        UtterlyContext utterlyContext)
     {
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri("https://utterlyapi.azurewebsites.net/");

@@ -7,32 +7,34 @@
 @{
 }
 
+<h2>@Model.UtterlyThread.Title</h2>
+
 @foreach (var post in Model.Posts)
 {
-    <div class="card mb-3">
-        <div class="card-body" id="@post.Id">
-            <span class="badge bg-secondary float-end">#@post.Id</span>
-            @if(post.ParentPostId.HasValue)
-            {
-                <p class="card-text">
-                    <small class="text-muted">Svar till <a href="#@post.ParentPostId">#@post.ParentPostId</a> </small>
-                </p>
-            }
-            <h6 class="card-subtitle mb-2 text-muted">
-                @post.User.UserName - @post.CreatedAt.ToString("U")
-            </h6>
-            <p class="card-text">@post.Content</p>
-            <div class="d-flex justify-content-between align-items-center">
-                @if (await UserManager.GetUserAsync(User) != null)
-                {
-                    <a asp-route-replyId="@post.Id">Svara</a>
-                    @if (UserManager.GetUserId(User) == post.UserId)
+    <div class="card">
+        <div class="card-header">
+            <span class="badge rounded-pill bg-primary float-end">#@post.Id</span>
+            <h6 class="card-subtitle text-muted">@post.CreatedAt.ToString("U")</h6>
+        </div>
+        <div class="container-fluid mb-2">
+            <div class="row">
+                <div class="col col-sm-auto text-center border-end">
+                    <p class="fw-bold">@post.User.UserName</p>
+                    <img src="@(post.User.ProfilePicture != null
+                                             ? $"data:image/png;base64,{Convert.ToBase64String(post.User.ProfilePicture)}"
+                                             : $"https://dummyimage.com/sqrpop/5af2b9/&text={post.User.UserName}")"
+                     alt="Profilbild" width="50px"/> 
+                </div>
+                <div class="col">
+                    @if (post.ParentPostId.HasValue)
                     {
-                        <form method="post" asp-page-handler="DeletePost" asp-route-id="@post.Id">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
+                        <small class="card-subtitle mb-2 text-muted float-sm-start">Svar till <a href="#@post.ParentPostId">#@post.ParentPostId</a> </small>
                     }
-                }
+                    <div class="card-body pb-0">
+                        <p class="card-text">@post.Content</p>
+                        <a asp-route-replyId="@post.Id" class="card-link">Svara</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -41,21 +43,20 @@
 <div class="container-md alert alert-warning">
     @if (await UserManager.GetUserAsync(User) != null)
     {
-        <form method="post" >
-            <div >
+        <form method="post">
+            <div>
                 <div class="mb-3">
-                <textarea asp-for="UPost.Content" class="form-control" id="postForm" rows="3"></textarea>
-                <span asp-validation-for="UPost.Content" class="text-danger"></span>
+                    <textarea asp-for="NewPost.Content" class="form-control" id="postForm" rows="3"></textarea>
+                    <span asp-validation-for="NewPost.Content" class="text-danger"></span>
                 </div>
-                <input type="hidden" asp-for="UPost.UserId" value="@UserManager.GetUserId(User)" />
-
-                <button type="submit" class="btn btn-primary">Post</button>
-                @if(Model.UPost != null && Model.UPost.ParentPostId.HasValue)
+                <input type="hidden" asp-for="NewPost.UserId" value="@UserManager.GetUserId(User)" />
+                @if (Model.NewPost != null && Model.NewPost.ParentPostId != null)
                 {
-                    <input type="hidden" asp-for="UPost.ParentPostId" value="@Model.UPost.ParentPostId" />
-                    <a href="@Url.Page("/Index", new { area = "" })" class="btn btn-secondary btn-danger">Avbryt svar</a>
-                    <p class="m-0">Svarar på #@Model.UPost.ParentPostId</p>
+                    <input type="hidden" asp-for="NewPost.ParentPostId" value="@Model.NewPost.ParentPostId" />
+                    <a href="@Url.Page($"/Threads/Posts", new { threadId = Model.UtterlyThread.Id})" class="btn btn-secondary btn-danger">Avbryt svar</a>
+                    <p class="m-0">Svarar på #@Model.NewPost.ParentPostId</p>
                 }
+                <button type="submit" class="btn btn-primary">Posta</button>
             </div>
         </form>
     }
@@ -64,7 +65,6 @@
         <p class="m-0">Du måste vara inloggad för att kunna göra inlägg och svara.</p>
     }
 </div>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

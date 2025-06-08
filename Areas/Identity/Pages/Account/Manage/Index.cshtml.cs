@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using Utterly.Areas.Identity.Data;
+using System.IO;
+using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Utterly.Areas.Identity.Pages.Account.Manage
 {
@@ -42,6 +45,12 @@ namespace Utterly.Areas.Identity.Pages.Account.Manage
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
+
+        [BindProperty]
+        [DataType(DataType.Upload)]
+        public IFormFile ProfilePicture { get; set; }
+
+        public byte[] ProfilePictureData { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -79,6 +88,7 @@ namespace Utterly.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            ProfilePictureData = user.ProfilePicture;
             await LoadAsync(user);
             return Page();
         }
@@ -93,6 +103,7 @@ namespace Utterly.Areas.Identity.Pages.Account.Manage
 
             if (!ModelState.IsValid)
             {
+                ProfilePictureData = user.ProfilePicture;
                 await LoadAsync(user);
                 return Page();
             }
@@ -107,6 +118,16 @@ namespace Utterly.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
+
+            if (ProfilePicture != null && ProfilePicture.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await ProfilePicture.CopyToAsync(ms);
+                user.ProfilePicture = ms.ToArray();
+                await _userManager.UpdateAsync(user);
+            }
+
+            ProfilePictureData = user.ProfilePicture;
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";

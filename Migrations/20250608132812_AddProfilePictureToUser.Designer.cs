@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Utterly.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using Utterly.Areas.Identity.Data;
 namespace Utterly.Migrations
 {
     [DbContext(typeof(UtterlyContext))]
-    partial class UtterlyContextModelSnapshot : ModelSnapshot
+    [Migration("20250608132812_AddProfilePictureToUser")]
+    partial class AddProfilePictureToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
