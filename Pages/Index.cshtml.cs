@@ -14,7 +14,7 @@ public class IndexModel : PageModel
     public List<UtterlyPost> UtterlyPosts;
 
     [BindProperty]
-    public UtterlyPost UPost { get; set; }
+    public UtterlyPost NewPost { get; set; }
 
     public IndexModel(
         UtterlyContext utterlyContext,
@@ -32,8 +32,8 @@ public class IndexModel : PageModel
 
         if (replyId != 0)
         {
-            UPost = new();
-            UPost.ParentPostId = replyId;
+            NewPost = new();
+            NewPost.ParentPostId = replyId;
         }
     }
 
@@ -45,10 +45,10 @@ public class IndexModel : PageModel
             return Page();
         }
 
-        UPost.CreatedAt = DateTime.Now;
-        UPost.UserId = _userManager.GetUserId(User);
+        NewPost.CreatedAt = DateTime.Now;
+        NewPost.UserId = _userManager.GetUserId(User);
 
-        var success = await _APIManager.CreateUtterlyPostAsync(UPost);
+        var success = await _APIManager.CreateUtterlyPostAsync(NewPost);
         if (!success)
         {
             ModelState.AddModelError(string.Empty, "Kunde inte skapa inlägg via API.");

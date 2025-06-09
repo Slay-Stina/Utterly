@@ -26,6 +26,7 @@ public class UtterlyPost
     public UtterlyUser? User { get; set; }
 
     // Foreign key till Thread
+    [Required]
     public int ThreadId { get; set; }
-    public UtterlyThread Thread { get; set; }
+    public UtterlyThread? Thread { get; set; }
 }

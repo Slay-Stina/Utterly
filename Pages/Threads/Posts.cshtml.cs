@@ -32,13 +32,6 @@ public class PostsModel : PageModel
         // Hämta inlägg för tråden
         Posts = await _apiManager.GetPostsByThreadIdAsync(threadId);
 
-        // Ladda användare för varje inlägg
-        foreach (var post in Posts)
-        {
-            post.User = await _userManager.FindByIdAsync(post.UserId);
-            // Ingen extra kod behövs här för profilbild
-        }
-
         if (replyId != 0)
         {
             NewPost = new UtterlyPost
@@ -50,23 +43,17 @@ public class PostsModel : PageModel
     }
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            Posts = await _apiManager.GetUtterlyPostsAsync();
-            return Page();
+            NewPost.CreatedAt = DateTime.UtcNow;
+
+            var success = await _apiManager.CreateUtterlyPostAsync(NewPost);
+            if (!success)
+            {
+                ModelState.AddModelError(string.Empty, "Kunde inte skapa inlägg via API.");
+            }
         }
-
-        NewPost.CreatedAt = DateTime.Now;
-        NewPost.UserId = _userManager.GetUserId(User);
-
-        var success = await _apiManager.CreateUtterlyPostAsync(NewPost);
-        if (!success)
-        {
-            ModelState.AddModelError(string.Empty, "Kunde inte skapa inlägg via API.");
-            Posts = await _apiManager.GetUtterlyPostsAsync();
-            return Page();
-        }
-
-        return RedirectToPage();
+        // Pass threadId (and replyId if needed) to the page
+        return RedirectToPage(new { threadId = NewPost.ThreadId });
     }
 }

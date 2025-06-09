@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Hosting;
 using Utterly.Areas.Identity.Data;
 using Utterly.Tools;
 
@@ -8,35 +9,27 @@ public class APIManager
 {
     private readonly HttpClient _httpClient;
     private readonly UtterlyContext _utterlyContext;
+    private readonly UserManager<UtterlyUser> _userManager;
     public APIManager(
         HttpClient httpClient, 
-        UtterlyContext utterlyContext)
+        UtterlyContext utterlyContext,
+        UserManager<UtterlyUser> userManager)
     {
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri("https://utterlyapi.azurewebsites.net/");
         _utterlyContext = utterlyContext;
+        _userManager = userManager;
     }
     public async Task<List<UtterlyPost>> GetUtterlyPostsAsync()
     {
-        List<UtterlyPost> utterlyPosts = new List<UtterlyPost>();
+        List<UtterlyPost> posts = new List<UtterlyPost>();
         var response = await _httpClient.GetAsync("Post");
         response.EnsureSuccessStatusCode();
-        utterlyPosts = await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
+        posts = await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
 
-        // Hämta User-objektet för varje post
-        var userIds = utterlyPosts.Select(p => p.UserId).Distinct().ToList();
-        var users = _utterlyContext.Users
-            .Where(u => userIds.Contains(u.Id))
-            .ToDictionary(u => u.Id);
+        await ConnectUserToPost(posts);
 
-        foreach (var post in utterlyPosts)
-        {
-            if (users.TryGetValue(post.UserId, out var user))
-            {
-                post.User = user;
-            }
-        }
-        return utterlyPosts;
+        return posts;
     }
 
     public async Task<bool> CreateUtterlyPostAsync(UtterlyPost post)
@@ -64,6 +57,15 @@ public class APIManager
         }
         var posts = await response.Content.ReadFromJsonAsync<List<UtterlyPost>>();
 
+        await ConnectUserToPost(posts);
+
         return posts;
+    }
+    private async Task ConnectUserToPost(List<UtterlyPost> posts)
+    {
+        foreach (var post in posts)
+        {
+            post.User = await _userManager.FindByIdAsync(post.UserId);
+        }
     }
 }
