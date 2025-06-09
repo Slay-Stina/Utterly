@@ -21,10 +21,18 @@ public class Program
         builder.Services.AddHttpClient();
         builder.Services.AddTransient<APIManager>();
 
+        builder.Services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.CheckConsentNeeded = context => true;
+            options.MinimumSameSitePolicy = SameSiteMode.None;
+        });
+
         // Add services to the container.
         builder.Services.AddRazorPages();
 
         var app = builder.Build();
+
+        app.UseCookiePolicy();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment() || app.Environment.IsStaging())

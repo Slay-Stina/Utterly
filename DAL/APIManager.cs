@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Utterly.Areas.Identity.Data;
 using Utterly.Tools;
@@ -20,25 +21,34 @@ public class APIManager
         _utterlyContext = utterlyContext;
         _userManager = userManager;
     }
-    public async Task<List<UtterlyPost>> GetUtterlyPostsAsync()
+    public async Task<List<UtterlyPost>> GetPostsAsync()
     {
         List<UtterlyPost> posts = new List<UtterlyPost>();
         var response = await _httpClient.GetAsync("Post");
         response.EnsureSuccessStatusCode();
         posts = await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
 
-        await ConnectUserToPost(posts);
+        foreach (var post in posts)
+        {
+            await ConnectUserToPost(post);
+        }
 
         return posts;
     }
 
-    public async Task<bool> CreateUtterlyPostAsync(UtterlyPost post)
+    public async Task<bool> CreatePostAsync(UtterlyPost post)
     {
         var response = await _httpClient.PostAsync("Post", post.ToContent());
         return response.IsSuccessStatusCode;
     }
 
-    internal async Task<List<UtterlyPost>> GetUtterlyPostsByUserIdAsync(string id)
+    public async Task<bool> UpdatePostAsync(UtterlyPost post)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"Post/{post.Id}", post.ToContent());
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<List<UtterlyPost>> GetPostsByUserIdAsync(string id)
     {
         var response = await _httpClient.GetAsync($"Post/User/{id}");
         if (!response.IsSuccessStatusCode)
@@ -48,7 +58,7 @@ public class APIManager
         return await response.Content.ReadFromJsonAsync<List<UtterlyPost>>() ?? new List<UtterlyPost>();
     }
 
-    internal async Task<List<UtterlyPost>> GetPostsByThreadIdAsync(int threadId)
+    public async Task<List<UtterlyPost>> GetPostsByThreadIdAsync(int threadId)
     {
         var response = await _httpClient.GetAsync($"Post/Thread/{threadId}");
         if (!response.IsSuccessStatusCode)
@@ -57,15 +67,31 @@ public class APIManager
         }
         var posts = await response.Content.ReadFromJsonAsync<List<UtterlyPost>>();
 
-        await ConnectUserToPost(posts);
-
-        return posts;
-    }
-    private async Task ConnectUserToPost(List<UtterlyPost> posts)
-    {
         foreach (var post in posts)
         {
-            post.User = await _userManager.FindByIdAsync(post.UserId);
+            await ConnectUserToPost(post);
         }
+        return posts;
+    }
+    public async Task<bool> DeletePost(int id)
+    {
+        var response = await _httpClient.DeleteAsync($"Post/{id}");
+        return response.IsSuccessStatusCode;
+    }
+    private async Task ConnectUserToPost(UtterlyPost post)
+    {
+        post.User = await _userManager.FindByIdAsync(post.UserId);
+    }
+
+    internal async Task<UtterlyPost> GetPostById(int postId)
+    {
+        var response = await _httpClient.GetAsync($"Post/{postId}");
+        response.EnsureSuccessStatusCode();
+        UtterlyPost post = new UtterlyPost();
+        post = await response.Content.ReadFromJsonAsync<UtterlyPost>() ?? new UtterlyPost();
+
+        await ConnectUserToPost(post);
+
+        return post;
     }
 }

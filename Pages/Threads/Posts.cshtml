@@ -11,29 +11,56 @@
 
 @foreach (var post in Model.Posts)
 {
+    var isSoftDeleted = post.Content == "Inlägget har tagits bort";
+    var isOwner = post.UserId == UserManager.GetUserId(User);
+
     <div class="card mb-2">
-        <div class="card-header">
-            <span class="badge rounded-pill bg-primary float-end">#@post.Id</span>
-            <h6 class="card-subtitle text-muted">@post.CreatedAt</h6>
+        <div class="card-header d-flex flex-column flex-sm-row justify-content-between">
+            <div class="d-flex align-items-center mb-2 mb-sm-0">
+                <img src="@(post.User?.ProfilePicture != null
+                                 ? $"data:image/png;base64,{Convert.ToBase64String(post.User.ProfilePicture)}"
+                                 : $"https://dummyimage.com/sqrpop/5af2b9/&text={post.User?.UserName ?? "?"}")"
+                     alt="Profilbild" width="40" height="40" class="rounded-circle me-2"/>
+                <span class="fw-bold me-3">@(post.User?.UserName ?? "[borttagen användare]")</span>
+            </div>
+            <div class="align-items-center">
+                <span class="card-subtitle text-muted m-sm-1 small">@post.CreatedAt</span>
+                <span class="badge rounded-pill bg-primary float-end">#@post.Id</span>
+            </div>
         </div>
         <div class="container-fluid mb-2">
             <div class="row">
-                <div class="col col-sm-1 text-center border-end">
-                    <p class="fw-bold text-break">@post.User.UserName</p>
-                    <img src="@(post.User.ProfilePicture != null
-                                             ? $"data:image/png;base64,{Convert.ToBase64String(post.User.ProfilePicture)}"
-                                             : $"https://dummyimage.com/sqrpop/5af2b9/&text={post.User.UserName}")"
-                     alt="Profilbild" width="75px" height="75px"/> 
-                </div>
                 <div class="col d-flex flex-column">
                     <div class="card-body pb-0">
                         @if (post.ParentPostId.HasValue)
                         {
                             <small class="card-subtitle mb-2 text-muted">Svar till <a href="#@post.ParentPostId">#@post.ParentPostId</a> </small>
                         }
+                        @if (isSoftDeleted)
+                        {
+                            <p class="card-text text-muted fst-italic">@post.Content</p>
+                        }
+                        else
+                        {
                             <p class="card-text">@post.Content</p>
+                        }
                     </div>
-                    <a asp-page="/Threads/Posts" asp-route-threadId="@Model.UtterlyThread.Id" asp-route-replyId="@post.Id" class="card-link float-sm-start">Svara</a>
+                    <div class="d-flex justify-content-between">
+                        @* Svara-knapp visas bara om inlägget inte är soft-deletat *@
+                        @if (!isSoftDeleted)
+                        {
+                            <a asp-page="/Threads/Posts" asp-route-threadId="@Model.UtterlyThread.Id" asp-route-replyId="@post.Id" class="card-link">Svara</a>
+                        }
+                        @* Ta bort-knapp visas bara om inlägget inte är soft-deletat och användaren är ägare *@
+                        @if (!isSoftDeleted && isOwner && post.UserId != null)
+                        {
+                            <form method="post" asp-page-handler="DeleteOrSoftDelete" class="d-inline">
+                                <input type="hidden" name="postId" value="@post.Id" />
+                                <input type="hidden" name="threadId" value="@Model.UtterlyThread.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Ta bort</button>
+                            </form>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -43,7 +70,18 @@
 <div class="container-md alert alert-warning">
     @if (await UserManager.GetUserAsync(User) != null)
     {
-        <form method="post">
+        @* Visa validerings- och API-fel *@
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form method="post" >
             <div>
                 <div class="mb-3">
                     <textarea asp-for="NewPost.Content" class="form-control" id="postForm" rows="3"></textarea>

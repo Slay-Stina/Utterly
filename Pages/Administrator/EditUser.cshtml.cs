@@ -90,7 +90,7 @@ public class EditUserModel : PageModel
             }
         }
 
-        UserPosts = await _apiManager.GetUtterlyPostsByUserIdAsync(user.Id);
+        UserPosts = await _apiManager.GetPostsByUserIdAsync(user.Id);
 
         return Page();
     }

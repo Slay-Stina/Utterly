@@ -8,65 +8,18 @@
     ViewData["Title"] = "Home page";
 }
 
+<h3>Senaste inläggen</h3>
 @foreach (var post in Model.UtterlyPosts)
 {
     <div class="card mb-3">
+        <div class="card-header">
+            <a asp-page="/Threads/Posts" asp-route-threadId="@post.Thread.Id">@post.Thread.Title</a>
+        </div>
         <div class="card-body" id="@post.Id">
-            <span class="badge bg-secondary float-end">#@post.Id</span>
-            @if(post.ParentPostId.HasValue)
-            {
-                <p class="card-text">
-                    <small class="text-muted">Svar till <a href="#@post.ParentPostId">#@post.ParentPostId</a> </small>
-                </p>
-            }
             <h6 class="card-subtitle mb-2 text-muted">
                 @post.User.UserName - @post.CreatedAt.ToString("U")
             </h6>
             <p class="card-text">@post.Content</p>
-            <div class="d-flex justify-content-between align-items-center">
-                @if (await UserManager.GetUserAsync(User) != null)
-                {
-                    <a asp-route-replyId="@post.Id">Svara</a>
-                    @if (UserManager.GetUserId(User) == post.UserId)
-                    {
-                        <form method="post" asp-page-handler="DeletePost" asp-route-id="@post.Id">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    }
-                }
-            </div>
         </div>
     </div>
-}
-<hr />
-<div class="container-md alert alert-warning">
-    @if (await UserManager.GetUserAsync(User) != null)
-    {
-        <form method="post" >
-            <div >
-                <div class="mb-3">
-                <textarea asp-for="NewPost.Content" class="form-control" id="postForm" rows="3"></textarea>
-                <span asp-validation-for="NewPost.Content" class="text-danger"></span>
-                </div>
-                <input type="hidden" asp-for="NewPost.UserId" value="@UserManager.GetUserId(User)" />
-
-                <button type="submit" class="btn btn-primary">Post</button>
-                @if(Model.NewPost != null && Model.NewPost.ParentPostId.HasValue)
-                {
-                    <input type="hidden" asp-for="NewPost.ParentPostId" value="@Model.NewPost.ParentPostId" />
-                    <a href="@Url.Page("/Index", new { area = "" })" class="btn btn-secondary btn-danger">Avbryt svar</a>
-                    <p class="m-0">Svarar på #@Model.NewPost.ParentPostId</p>
-                }
-            </div>
-        </form>
-    }
-    else
-    {
-        <p class="m-0">Du måste vara inloggad för att kunna göra inlägg och svara.</p>
-    }
-</div>
-
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
 }

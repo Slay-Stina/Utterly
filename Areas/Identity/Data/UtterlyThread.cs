@@ -21,5 +21,5 @@ public class UtterlyThread
     public UtterlyUser User { get; set; }
 
     // Navigation property
-    public ICollection<UtterlyPost> Posts { get; set; }
+    public ICollection<UtterlyPost>? Posts { get; set; }
 }

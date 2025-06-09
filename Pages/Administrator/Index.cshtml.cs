@@ -33,7 +33,7 @@ public class IndexModel : PageModel
     public string RoleName { get; set; }
     public async Task OnGetAsync()
     {
-        UtterlyPosts = await _utterlyPostAPIManager.GetUtterlyPostsAsync();
+        UtterlyPosts = await _utterlyPostAPIManager.GetPostsAsync();
         Roles = await _roleManager.Roles.ToListAsync();
         Users = await _userManager.Users.ToListAsync();
     }

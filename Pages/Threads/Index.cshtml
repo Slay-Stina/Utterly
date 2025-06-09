@@ -16,8 +16,14 @@ else
         @foreach (var thread in Model.Threads)
         {
             <li class="list-group-item">
-                <a asp-page="/Threads/Posts" asp-route-threadId="@thread.Id">@thread.Title</a>
-                <span class="text-muted float-end">@thread.CreatedAt.ToString("U")</span>
+                <row class="d-flex justify-content-between">
+                    <a asp-page="/Threads/Posts" asp-route-threadId="@thread.Id">@thread.Title</a>
+                    <span class="text-muted accept-policy ms-2">@thread.Posts.Count.ToString("N0") inlägg</span>
+                </row>
+                <row class="accept-policy d-flex justify-content-between">
+                    <span class="text-secondary">@thread.User.UserName</span>
+                    <span class="text-muted">@thread.CreatedAt.ToString("U")</span>
+                </row>
             </li>
         }
     </ul>

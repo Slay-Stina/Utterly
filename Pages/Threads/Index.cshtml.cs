@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Utterly.Areas.Identity.Data;
+using Utterly.DAL;
 
 namespace Utterly.Pages.Threads;
 
@@ -10,13 +11,16 @@ public class IndexModel : PageModel
 {
     private readonly UtterlyContext _context;
     private readonly UserManager<UtterlyUser> _userManager;
+    private readonly APIManager _apiManager;
 
     public IndexModel(
         UtterlyContext context,
-        UserManager<UtterlyUser> userManager)
+        UserManager<UtterlyUser> userManager,
+        APIManager apiManager)
     {
         _context = context;
         _userManager = userManager;
+        _apiManager = apiManager;
     }
 
     public Category Category { get; set; }
@@ -36,6 +40,12 @@ public class IndexModel : PageModel
             .Where(t => t.CategoryId == categoryId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
+
+        foreach (var thread in Threads)
+        {
+            thread.User = await _userManager.FindByIdAsync(thread.UserId);
+            thread.Posts = await _apiManager.GetPostsByThreadIdAsync(thread.Id);
+        }
 
         return Page();
     }
