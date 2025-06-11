@@ -44,7 +44,7 @@ public class APIManager
 
     public async Task<bool> UpdatePostAsync(UtterlyPost post)
     {
-        var response = await _httpClient.PutAsJsonAsync($"Post/{post.Id}", post.ToContent());
+        var response = await _httpClient.PutAsync($"Post/{post.Id}", post.ToContent());
         return response.IsSuccessStatusCode;
     }
 

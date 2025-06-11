@@ -31,5 +31,6 @@ public class IndexModel : PageModel
             post.User = await _userManager.FindByIdAsync(post.UserId);
             post.Thread = await _utterlyContext.Threads.FindAsync(post.ThreadId);
         }
+        UtterlyPosts.Reverse();
     }
 }

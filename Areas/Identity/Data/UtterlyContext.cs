@@ -13,6 +13,7 @@ public class UtterlyContext : IdentityDbContext<UtterlyUser>
     public DbSet<UtterlyPost> UtterlyPosts { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<UtterlyThread> Threads { get; set; }
+    public DbSet<PersonalMessage> PersonalMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +35,18 @@ public class UtterlyContext : IdentityDbContext<UtterlyUser>
             .HasOne<UtterlyPost>()
             .WithMany()
             .HasForeignKey(p => p.ParentPostId)
-            .OnDelete(DeleteBehavior.Restrict); // om du har ParentPostId
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<PersonalMessage>()
+            .HasOne(pm => pm.Sender)
+            .WithMany()
+            .HasForeignKey(pm => pm.SenderId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<PersonalMessage>()
+            .HasOne(pm => pm.Receiver)
+            .WithMany()
+            .HasForeignKey(pm => pm.ReceiverId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

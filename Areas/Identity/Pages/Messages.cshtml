@@ -1,0 +1,70 @@
+﻿@page "{userId?}"
+@model Utterly.Areas.Identity.Pages.MessagesModel
+@{
+    var recipient = Model.RecipientUser;
+    var activeUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+@if (recipient != null)
+{
+    <a asp-page="./Messages" asp-route-userId="" class="btn btn-secondary mb-3">Tillbaka till konversationer</a>
+    <h2>Konversation med @recipient.UserName</h2>
+    <div id="messageScrollbox" class="message-scrollbox mb-3" tabindex="0">
+        @foreach(var message in Model.Messages)
+{
+    var isMe = message.SenderId == activeUserId;
+    <div class="message-row @(isMe ? "justify-content-end" : "justify-content-start")">
+        <div class="message-bubble @(isMe ? "me" : "them")">
+            <strong>@(isMe ? "Du" : Model.RecipientUser.UserName):</strong>
+            <span> @message.Content</span>
+            <div class="text-muted small">@message.SentAt.ToLocalTime().ToString("g")</div>
+        </div>
+    </div>
+}
+    </div>
+    <form method="post">
+        <input type="hidden" asp-for="Input.RecipientId" />
+        <div>
+            <textarea asp-for="Input.MessageText" rows="5" cols="40"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Skicka</button>
+    </form>
+}
+else
+{
+    <p>Välj en användare att skicka meddelande till.</p>
+
+
+    @if (Model.ConversationPartners.Any())
+    {
+        <h3>Dina konversationer</h3>
+        <div class="list-group">
+            @foreach (var partner in Model.ConversationPartners)
+            {
+                <a asp-page="./Messages"
+                   asp-route-userId="@partner.Id"
+                   class="list-group-item list-group-item-action d-flex align-items-center">
+                    <img src="@(partner.ProfilePicture != null ?
+                            $"data:image/png;base64,{Convert.ToBase64String(partner.ProfilePicture)}"
+                            : $"https://dummyimage.com/sqrpop/5af2b9/&text={partner.UserName ?? "?"}")"
+                            alt="Profilbild" width="40" height="40" class="rounded-circle me-2" />
+                    <span class="fw-bold">@partner.UserName</span>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <p>Du har inga konversationer än.</p>
+    }
+}
+
+@section Scripts {
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            var box = document.getElementById('messageScrollbox');
+            if (box) {
+                box.scrollTop = box.scrollHeight;
+            }
+        });
+    </script>
+}

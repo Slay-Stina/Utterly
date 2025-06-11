@@ -22,6 +22,10 @@
                                  : $"https://dummyimage.com/sqrpop/5af2b9/&text={post.User?.UserName ?? "?"}")"
                      alt="Profilbild" width="40" height="40" class="rounded-circle me-2"/>
                 <span class="fw-bold me-3">@(post.User?.UserName ?? "[borttagen användare]")</span>
+                @if(!isOwner)
+                {
+                    <a asp-area="Identity" asp-page="/Messages" asp-route-userId="@post.UserId">Skicka PM</a>
+                }
             </div>
             <div class="align-items-center">
                 <span class="card-subtitle text-muted m-sm-1 small">@post.CreatedAt</span>
