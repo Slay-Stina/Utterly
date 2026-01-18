@@ -1,0 +1,65 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch: # Allows you to run this manually from the Actions tab
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Publish .NET Project
+      run: dotnet publish Utterly.csproj -c Release -o release --nologo /p:GHPages=true
+
+    # --- Blazor WASM Specific Fixes ---
+
+    # 1. Change base-tag in index.html from '/' to '/RepoName/' so assets load correctly
+    - name: Change base-tag in index.html from / to Project Name
+      run: sed -i 's/<base href="\/" \/>/<base href="\/Utterly\/" \/>/g' release/wwwroot/index.html
+
+    # 2. Add .nojekyll file so GitHub Pages doesn't ignore files starting with '_' (like _framework)
+    - name: Add .nojekyll file
+      run: touch release/wwwroot/.nojekyll
+
+    # 3. Copy index.html to 404.html to handle client-side routing
+    - name: Fix SPA routing
+      run: cp release/wwwroot/index.html release/wwwroot/404.html
+
+    # --- Upload Artifact for Deployment ---
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: release/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
